@@ -1,0 +1,100 @@
+---
+title: 'AEM Instance: Local Installation and Quick Tour'
+date: 2025-04-01T15:32:14Z
+lastmod: '2025-04-01'
+tags: ['aem', Installation, guide]
+draft: true
+summary: 'AEM Cloud SDK local setup and tour of all the features and functionalities of each tile given by Adobe to leverage AEM as a CMS.'
+layout: PostLayout
+---
+
+You are now ready to start working with AEM. In this article, we will walk through the local setup of an AEM instance and associated user interfaces. However, before we begin this adventure, I hope you have a solid understanding of AEM architecture. For this article, we will use the AEM Cloud version SDK to complete my local setup.
+
+> [!Note]
+> The setup steps for all AEM services from Adobe are the same. Only the Jar files varies.
+
+```javascript
+var num1, num2, sum
+num1 = prompt('Enter first number')
+num2 = prompt('Enter second number')
+sum = parseInt(num1) + parseInt(num2) // "+" means "add"
+alert('Sum = ' + sum) // "+" means combine into a string
+```
+
+## Prerequisites and Software Requirements :-
+
+1.`[JAVA]` (Recommended version is 11).
+
+2.`[Maven]` (Recommended version is 3.8).
+
+3.`[Node]` (Recommended to have latest).
+
+4.`Latest [Cloud AEM SDK]` using Adobe ID.
+
+5.`[JAVA]` and `[Maven]` setup in your system.
+
+Once you’ve downloaded and installed all of the essential software listed above, you’re ready to set up a local AEM instance.
+
+> [!Note]
+> By executing following commands, you should be able to get software versions as a output.
+
+```javascript
+java -version , mvn --version , node -v , npm -v
+```
+
+## Installation instructions for AEM Cloud SDK :
+
+**Step 1:** Create a workspace for your project and move the downloaded zip file into that folder.
+
+**Step 2:** After extracting the zip file, you’ll get a file with .jar extension. This is the executable file.
+
+**Step 3:** Open the terminal, navigate to the AEM Instance folder, and perform the command below to launch the instance.
+
+```javascript
+java -jar aem-sdk-quickstart-<INSTALLED_SDK_VERSION>.jar -p 4502 -gui -debug 8080
+```
+
+**Step 4:** AEM loading popup will be shown. (e.g., fig. 4.1).
+
+![Loading Popup](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*57h2Ml5aBImY3YEVd4JhVQ.png)
+
+**Step 5:** Post completion of the progress bar, it will navigate you to the Chrome screen with this URL.
+
+**Step 6:** When you finish your work, return to the terminal and hit CTRL + C to close the instance. Otherwise, the instance will crash if abruptly closed.
+
+## Guide to AEM User Interface :
+
+This screen indicates that all dependent downloads and instance setup have been completed. You will be brought to this screen, where your user name and password will be admin (the default ID and password for all instances). If the progress meter in step 4 is complete but you still do not see this screen, try this URL.
+
+![Navigation](https://miro.medium.com/v2/resize:fit:2000/format:webp/1*oO6Sr2fFO6ofjzcSaB8sdQ.png)
+
+Let me go through each of the tiles you see and explain their significance and use. This interface is most commonly used by the author who manages material in AEM. This section is mostly content-focused. A picture of the same is shown below, and the explanation will be given in the order shown.
+
+- **Search:-** This is used to search anything you’ve saved in AEM. It will index the entire AEM and return the result where he finds the same word.
+- **Help:-** This allows you to obtain AEM versions, support, and related documentation, among other things.
+- **Inbox:-** This is used to notify you when you receive new tasks, changes, and so on.
+- **Profile:-** Here, you may view the user’s login profile and sign out.
+- **AEM Version:-** If you want to verify the AEM version and other disclaimers, go here directly.
+- **Navigation Tool:-** A shortcut to the AEM maintenance interface for all content and assets (DAM).
+- **Projects:-** It helps to create a project-specific task. Which will eventually help to track the projects progress.
+- **Sites:-** The most important and often used part. It helps to keep the content up to date by creating and changing website pages.
+- **Experience Fragment:-** It allows authors to add components whose design and content may be shared to other pages or platforms using Headless capabilities.
+- **Assets:-** This refers to the process of uploading digital assets into AEM that can then be utilised to create pages on the site.
+- **Personalisation:-** It aids in the generation of user-centric dynamic content based on the needs of the page. So that users can spend a long time on the website.
+- **Content Fragment:-** It supports headless features, allowing users to author content and share it with others. Only the content can be managed.
+
+![CRXDE UI](https://miro.medium.com/v2/resize:fit:2000/format:webp/1*NOViq70M_hxDWAvDgwBb_g.png)
+The above image is highly useful for AEM developers. To navigate the above-mentioned user interface, follow this link: http://localhost:4502/crx/de/index.jsp. There are several folders containing components, templates, and configurations for specific projects. Let us try to grasp each folder and its significance.
+
+- **apps:-** Stores all custom components, templates, and configurations created by developers.
+- **conf:-** Stores editable templates, context-aware configurations (CAConfig), and core settings.
+- **content:-** Stores actual website content (pages, assets, experience fragments).
+- **etc:-** Store the archived data of sites, workflow data, and AEM System user creation.
+- **home:-** AEM system users information, groups assigned to users so that it can be restricted to edit certain areas in AEM.
+- **oak:index:-** Stores AEM query indexes for optimising JCR searches.
+- **system:-** Stores AEM system settings, OSGi bundles, and licensing data.
+- **var:-** Stores temporary/generated data like workflows and audits.
+
+I hope you are now familiar with AEM instances, including their features, capabilities, functionalities, and folder structures. In the upcoming blog, we will create our own project in AEM till then stay connected.
+
+Thank you 🙏 !

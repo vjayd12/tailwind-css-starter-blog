@@ -1,0 +1,75 @@
+---
+title: 'Style Guide for Core Components'
+date: 2025-04-24T15:32:14Z
+lastmod: '2025-04-24'
+tags: ['aem', 'guide', 'Styling', 'Core Components']
+draft: false
+summary: 'Learn how to create dynamic, scalable web experiences using AEM Pages, and master Adobe Experience Managers Digital Asset Manager (DAM) to streamline content delivery. This guide covers best practices, tips for performance optimization, and how to align your assets and pages for a seamless digital strategy.'
+layout: PostLayout
+---
+
+---
+
+Hey Folks 🙌 ,Till now we've seen component development, template creation, and page creation. Now in this article we will see a unique technique to apply CSS to the components. It is also known as a template-based authoring style guide for the components. Mostly this type of styling is applied to OOTB core components provided by AEM, but according to need we can project we can give it to our custom components too. Today we will see only the core components, as we have seen styling for custom components in previous series of blogs.
+
+Apart from component-level styling, there are two more ways from where we can apply styles. Let's explore both and their use cases and advantages :
+
+![Style CSS](https://cdn-images-1.medium.com/v2/resize:fit:1600/1*WqEOW0hcGZ9spfQ9wRJ1Pw.png)
+
+## 1️⃣ Component-level Styling 
+
+We will be using the Button core component for our example. By default, all the core components reside in the /libs folder of the AEM instance directory. You can check it out here the list of core components and there implementations. If we want to add additional features to the core component, we overlay it and create it under the /apps directory and do customisation in that. For overlaying the existing core component, we give it a proper property name, sling:resourceSuperType.
+
+**Step 1 :** Create an extended core component with clientlib and HTML files for applying CSS. 
+
+**Step 2 :** Update the HTML by including CSS and JS file names.
+
+**Step 3 :** Go to Template and choose the component you have created. Here we have given different component group names so that we can get to know about that feature too.
+
+**Step 4 :** To add a new component group component on the page. Click on the allowed component container of the template.
+Component Group adding to template
+
+**Step 5:** Select the policy icon and search for the group name that you have given. Choose if you want to select a whole group or specific component, and click on done.
+
+**Step 6 :** Select the policy icon next to the component and give the policy name and class name for CSS and grouping.
+
+- Point 1 :By clicking on the + icon, you can add a new policy name, or you can select from the existing policy names, which will be bound with the component.
+- Point 2 : Here you can give the group name to cluster the class name as per the design element.
+- Point 3 : This refers to the class name that will be applied post-selection on the component.
+
+**Step 7 :** Go to the page and select the brush icon and choose the respective class you need as per the design.
+
+> [!Note]
+> Source code is there in Github you can check out here.
+
+## 2️⃣ Template-Level Styling
+
+This type of styling is referred to when you have to apply the styling across the template. Ideally, Common , base CSS, and JS are mentioned here.
+
+**Step 1 :** Navigate to clientlib folder of ui.apps
+**i.e ui.apps/src/main/content/jcr_root/apps/aemtutorial/clientlibs**
+
+**Step 2 :** Copy the existing clientlib folder, or you can create it the same way we created it above.
+
+**Step 3 :** Give the category name in the content.xml file.
+
+**Step 4 :** Go to the template, click on the page information icon on top, and select page policy.
+
+**Step 5 :** Write the category name you have defined in the clientlib file and save it.
+
+**Step 6 :** Go to the page, and you can check the styles.
+
+For the demo and to show the hierarchy of application of CSS to the same element , I have chosen the same component element , but you can use generic CSS, which will be common across websites and templates.
+
+> [!Note]
+> There is precedence of styling when you apply css to specific section.
+> `Component Level > Page Level > Template Level`
+
+--
+
+## Conclusion 
+
+In this blog, you have seen different ways and use cases to apply CSS and JS for the same or different components depending on scenarios. Now you can call yourself an AEM frontend developer. where you know HTL, HTML, CSS, JS, Sites, and different ways of styling in AEM.
+In our next blog, we will explore more advanced and modern technologies for frontend development.
+
+Thank you 🙏 !

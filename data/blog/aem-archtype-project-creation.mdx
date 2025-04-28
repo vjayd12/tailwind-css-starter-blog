@@ -1,0 +1,96 @@
+---
+title: 'The Ultimate Guide to Creating an AEM Project'
+date: 2025-04-04T15:32:14Z
+lastmod: '2025-04-04'
+tags: ['aem', 'cms', archetype]
+draft: false
+summary: 'Getting into the world of Adobe Infrastructure for AEM'
+layout: PostLayout
+---
+
+Are you excited to create your first `Maven-based AEM` project ? Here you go. We will create and deploy our AEM Maven-based project to an AEM instance. I hope you have your AEM instance up and running; if not, please check out the previous blog before we start with project creation.
+
+Since we are close to project creation, I would like you to get some glimpse of Maven projects and Maven archetypes, which play a vital role for project creations.
+
+![AEM Maven Project](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*wmZVKl_cGHeLK7s_W0lpdQ.png)
+
+## Steps for project creation and deployment :
+
+**Step 1 :-** Open the terminal and check the maven version.
+
+**Step 2 :-** Create the workspace for the project and execute the below command, which will create a Maven-based AEM project for you.
+
+```javascript
+mvn -B org.apache.maven.plugins:maven-archetype-plugin:3.2.1:generate \
+  -DarchetypeGroupId=com.adobe.aem \
+  -DarchetypeArtifactId=aem-project-archetype \
+  -DarchetypeVersion=50 \
+  -DappTitle="AEM Tutorial" \
+  -DappId="aemtutorial" \
+  -DgroupId="com.aemtutorial" \
+  -DaemVersion=cloud \
+  -DincludeDispatcherConfig=true \
+  -DfrontendModule=general \
+  -Dlanguage=en \
+  -Dcountry=us \
+  -DsingleCountry=false \
+  -DincludeExamples=true \
+  -DincludeErrorHandler=true
+```
+
+> [!Note]
+> This is sample command for project you can create you own project as per the requirement. Check the properties from here and configure your project accordingly.
+
+**Step 3 :-** After successfully creating the project, navigate to the project directory and enter the following command. This will build and deploy the whole project to an AEM instance.
+
+```javascript
+mvn clean install -PautoInstallSinglePackage
+```
+
+![code successfully deploy](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*QPjQM6etp7Mr0oWjOhD67Q.png)
+
+> [!Note]
+> You can use `Eclipse / IntelliJ / Vscode` as IDE for code development.
+
+We can run a few other commands too depending on what we want to deploy.
+
+- If we are looking to deploy only apps, i.e., **frontend code**, then run the command
+
+```javascript
+mvn clean install -PautoInstallPackage
+```
+
+- If we want to deploy only **backend code** , i.e java code than run
+
+```javascript
+mvn clean install -PautoInstallBundle
+```
+
+![CRXDE](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*ZRrRkeQ7rTACxZ7jvL8_RA.png)
+
+Let me walk you through our project. Its folders placed on an AEM instance will also look for further dependencies.
+
+Go to this [URL](http://localhost:4502/crx/de/index.jsp) to get on the above screen. As you can see, all root folders have our AEM projects subfolders in them. Structure is the same where **/apps** will contain the code , **/conf** will contain project-specific configurations , **/content** will contain assets and pages.
+
+- Assets folder of the project
+  ![Assets Console](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*_XwZaXCqu2ohctLPgEzMsA.png)
+
+- Experience Fragment folder of the project
+  ![Experience Fragment Console](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*V20P7Yr42uajyXX8RyoGjA.png)
+
+- Sites / Content folder of the project
+  ![Sites Console](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*LQTqkWOZmlNAlO2CFhL2iQ.png)
+
+> [!Note]
+> we can have multiple project in same AEM Instance. It will get pilled up in respective directories as shown above.
+
+![CRX Package Manager](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*OQTEUW05Ou_3fS61zA0FOg.png)
+
+In the image above, we can see many packages; when we run the Maven command, i.e., `mvn clean install -PautoInstallSinglePackage`, to build the project internally, the package is built and deployed in the AEM instance. It uploads first, then installs, and we can confirm it using CRXDE lite. Each package contains both internal dependencies and the project code. You can expand it to see more detail by going to this [url](http://localhost:4502/crx/de/index.jsp).
+
+> [!Note]
+> My Github repo is linked [here](https://github.com/vjayd12/aem_demo_project/tree/project-creation) please checkout to `project-creation` branch and clone it.
+
+Congratulations 🥳 ! On clearing the first step of AEM developer. You have successfully built and deployed your first AEM project.
+
+Thank you 🙏 !

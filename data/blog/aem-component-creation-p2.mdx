@@ -1,0 +1,178 @@
+---
+title: 'A Complete Guide for Component Development — Part 2'
+date: 2025-04-14T15:32:14Z
+lastmod: '2025-04-14'
+tags: ['aem', 'cms', archetype, aemdeveloper, component]
+draft: false
+summary: 'A Journey of Understanding AEM Components, Core Components, and Extended Components.'
+layout: PostLayout
+---
+
+Fantastic stuff 🎉 ! We have completed the AEM component building process. I understand that this is a static component; however, we will make it dynamic in the following article series. In this article we will focus on how we can add styling to our static component and access that component on my page.
+
+Are you excited to see the first ever-generated basic component on the page ? Let’s get started.
+
+![Component Development](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*jwocV1Su2ui7fwsdh6AFog.png)
+
+## Lets get started with the stesps of adding components to the page
+
+**Step 1 :-** Navigate to Start page of AEM i.e http://localhost:4502/aem/start.html
+
+**Step 2 :-** Go to sites where all the contents are created. (If you don’t know about those tiles, please check my articles i have explained in detail.)
+
+**Step 3 :-** Here you will see multiple projects; choose yours and navigate further.
+
+**Step 4 :-** Select the directory under which you want to create, click on the create option, and choose the page option.
+
+![Page Creation](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*Fjq3evOgGZtkzngBm7EjxA.png)
+
+**Step 5 :-** Select the type of page you want to create. As the project progresses, there can be multiple types, like experience fragments, content-heavy articles, etc. Here we will choose Content Page and click on Next.
+
+**Step 6 :-** Fill out the necessary metadata for the page.
+
+> [!Note]
+> If Name does not contain any value then title will be considered default and it will also considered as URL for the page
+
+**Step 7 :-** Select the page and open it in editor mode.
+![Page Editing](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*h7CJo9U6GhKEdVuTeO--vA.png)
+
+> [!Note]
+> If you want to create a new page under the Demo Page directory, you can choose the Create option.
+> For updating the meta data of the selected page, choose Properties; and for editing the current page, choose Edit, etc.
+
+**Step 8 :-** Page will be opened in editor mode. Select your component name (i.e., `DEMO Component` in our case), which you have given while creating the component, and you will be able to see the data of the component.
+![Component add](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*nniEon7Z-zid4PgOW3srqg.png)
+
+**Step 9 :-** Click on top navigation and select view as publish to get a preview of how it will be visible once it is published and live.
+![Preview of the Page](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*TyfTOXalZrycUWvSU0jv0w.png)
+
+## Styling and Scripting of the component
+
+In AEM all the styling and scripting need to be done in the clientlib folder, as per Adobe standards, which will be further attached to the component to get it applied.
+
+**Step 1 :-** Create a folder with the name clientlibs at the same hierarchy as cq:dialog.
+
+**Step 2 :-** Create .content.xml file under the clientlib folder and paste the below code.
+
+> [!Note] >`jsProcessor` and `cssProcesser` that help for minification and categories is the properties that are unique for each component , which will help to bind our clientlib to html code.
+
+````javascript
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    jcr:primaryType="cq:ClientLibraryFolder"
+    categories="[aemtutorials.demo]"
+    cssProcessor="[default:none,min:none]"
+    jsProcessor="[default:none,min:none]"
+    allowProxy="{Boolean}true"/>
+    ```
+
+**Step 3 :-** Create a CSS folder and add style.css file under the folder directory, where we will be writing custom styles.
+
+```css
+.card {
+    width: 300px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+}
+
+.card img {
+    width: 100%;
+    height: auto;
+}
+
+.card-content {
+    padding: 15px;
+    text-align: center;
+}
+
+.card-content h3 {
+    margin-bottom: 10px;
+    font-size: 1.5em;
+}
+
+.card-content p {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.card-content button {
+    background: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s ease;
+}
+
+.card-content button:hover {
+    background: #0056b3;
+}
+````
+
+**Step 4 :-** Create a JS folder and add script.js file under the JS folder. In this file, we will be writing custom javascripts.
+
+```javascript
+document.getElementById('btn').addEventListener('click', function () {
+  const btn = document.getElementById('btn')
+  btn.style.color = 'black'
+  btn.style.background = 'yellow'
+})
+```
+
+**Step 5 :-** Create css.txt and js.txt files at the level of the clientlib folder. Mention the file's respective file name created for css and JS.
+For CSS :
+
+```javascript
+#base=css
+style.css
+```
+
+For JS :
+
+```javascript
+#base=js
+script.js
+```
+
+> [!Note]
+> The file name should be the same as the one you made under CSS and JS folders. If there are numerous files in each folder to simplify the logic, make sure to include the sequence in which they should be loaded.
+
+**Step 6 :-** Update the HTML file by including CSS and JS at the top and bottom.
+
+````javascript
+<sly data-sly-use.clientLib="/libs/granite/sightly/templates/clientlib.html"
+    data-sly-call="${clientlib.css @ categories='aemtutorials.demo'}" />
+
+<div class="card">
+    <img src="https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-859.jpg?t=st=1742962932~exp=1742966532~hmac=004d3eff238972e2d5016ea7650b5f838d0478d445574e74ff4dcdf13189716c&w=1380" alt="Card Image">
+    <div class="card-content">
+        Name : <h3>XYZ</h3>
+        Number of Years on IT : <p>3</p>
+        Career background : <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. </p>
+        Gender Type : <p>MALE</p>
+        <button id="btn">Click to change color</button>
+    </div>
+</div>
+
+<sly data-sly-use.clientLib="/libs/granite/sightly/templates/clientlib.html"
+    data-sly-call="${clientlib.js @ categories='aemtutorials.demo'}" />
+    ```
+
+![Demo Code](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*kQZBaWmCXSqqOGr_H9SxAw.png)
+
+**Step 7 :-** Go to the page and refresh it. You will see the CSS and JS are applied to the component.
+
+In the next article of this series, we will explore more options and the complexity of the component and how we can make this static component dynamic with multiple values and fields, so stay connected.
+
+Thank you 🙏 !
+````

@@ -1,0 +1,105 @@
+---
+title: 'AEM Pages vs DAM: Understanding Their Role in Content Strategy'
+date: 2025-04-22T15:32:14Z
+lastmod: '2025-04-22'
+tags: ['aem', Installation, guide, pages, dam]
+draft: false
+summary: 'Learn how to create dynamic, scalable web experiences using AEM Pages, and master Adobe Experience Managers Digital Asset Manager (DAM) to streamline content delivery. This guide covers best practices, tips for performance optimization, and how to align your assets and pages for a seamless digital strategy.'
+layout: PostLayout
+---
+
+Hello 👋, In our previous series, we created and added a component to a page. Webpages are critical to CMS scalability, flexibility, and ease of management. In this article, we will look over page creation in detail, as well as other page-related options. Since we’re talking about content strategies, we’ll also touch base on `DAM (digital asset management)`. Pages are the primary building blocks of web content in Adobe Experience Manager. It allows us to `manage, develop, edit, and publish` content more efficiently on the platform.
+
+Before we start with creating a page, we need to understand how the page works and what layers a webpage consists of in AEM.
+
+## 📃 Page Structure and its layers :
+
+The site webpage comprises 3 nesting layers, i.e `Base Page -> Template -> Sites Page`. Let's understand each of them :
+
+**`Base Page :-`** This is the 1st layer of the web page, which is also called as the structure of the page in AEM terms also, this is hidden layer, which is used for AEM project configurations. Generally in the project we have a max of 4–5 types of base pages, which define the core functionalities of the actual page.
+
+**`Template :-`** This is the 2nd layer of the web page, where all the page-level configurations and settings are done. Like allowing the component groups, styling, policies, etc.
+
+**`Site Page :-`** This is the actual webpage which you see in frontend that is editable in mode and created by the author to drag and drop the component for authoring.
+
+![Page Structure](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*Z0LcRIUOIYra2QWKfeUwHg.png)
+
+## 📌 Steps to Create a Template and Page :
+
+**Step 1 :-** Navigate to the AEM Start console. Select the tool icon and click on the Template option.
+![Navigate Sites](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*Wi1B4Np2as9_dIEcmUQtHA.png)
+
+**Step 2 :-** Select the project and navigate into the folder.
+
+**Step 3 :-** Select the create option and choose the page (default base page provided in AEM) option because we are creating a new template for our webpage.
+
+**Step 4 :-** Enter Template title and save it.
+
+**Step 5 :-** Select the template you have created and choose the Enable and Publish option to use it while creating a webpage.
+
+**Step 6 :-** Navigate to sites and go to the directory where you want to create a webpage.
+
+**Step 7 :-** Select create option Choose a page and select the template that we have created and give the necessary metadata to the webpage.
+
+## 📌 How can I add other component groups in the template ?
+
+As we all know, we give a property called component group while creating components. Basically, this is given for clustering the components together so that all the components of the same page type can be used in the same templates without any config changes.
+
+Suppose we’ve developed a couple of more components with different component groups, and I’d like to add them to my page, so let’s see how we can achieve this by altering template-level configs. Because, as we discussed above, all the page-level configs are done at templates.
+
+**Step 1 :-** Go to the respective page and select the Edit Template option.
+
+**Step 2 :-** Click on the policy icon as shown in the fig.,and you will see the list of components allowed for the template.
+template policy
+
+![Template Policy](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*JasWF1y9kxhajnPRnwRA_Q.png)
+
+**Step 3 :-** In the search bar, type the component name or group name you wish to add , select that, and click on done.
+
+**Step 4 :-** Refresh the page, and you will see newly added components in the list.
+
+**Step 5 :-** Go to the editor mode of the webpage and try to access the component you have added.
+
+## Few other important features for Page :
+
+Additional feature for the page
+
+![Additional Properties](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*MiHQ4R1mT5r88Mmo_TEQyA.png)
+
+**`Properties :-`** This feature is used when we want to add any. metadata for the page.
+
+**`Quick Publish :-`** If all the content is ready and we get the approval for the page by clicking on Quick Publish, we can do instant publishing and make it live.
+
+**`Manage Publication :-`** This key feature is used when we want to publish the content at a specific time. We can schedule any date and time as per the requirement, and it will be auto-published. This feature is mostly used when we have a sale to be live at midnight; we have updated the banners of the webpages but are waiting for the correct time.
+
+**`Delete :-`** This feature is used when we want to delete the specific page.
+
+**`Restore :-`** This feature is used when we want to restore the older version of the page or older content that is authored.
+
+**`Move :-`** This feature is used when we want to move a webpage from one directory to another and you want all internal links of that particular pages should also be updated.
+
+## 🎆 Walkthrough to Digital Asset Manager (DAM) :
+
+In Adobe Experience Manager (AEM), Digital Asset Manager (DAM) is a centralised repository for managing, storing, and delivering digital content. It is a component of AEM Assets, which simplifies asset management and handling for web, marketing, and digital interactions. It allows you to add metadata and other tagging to the assets.
+
+## How do I navigate and upload assets in DAM ?
+
+**Step 1 :-** Go to the start page of AEM. You will see the tile as assets.
+
+**Step 2 :-** Get into the asset folder, select the files option, and navigate to the project directory.
+
+**Step 3 :-** You can create a folder as per your convenience or directly upload the asset.
+
+**Step 4 :-** Click on the Create option in the top right corner, select the suited option, and upload the asset.
+
+**Step 5 :-** If you want to add metadata to the uploaded asset. Select the asset, and on the top bar, choose the properties option.
+
+**Step 6 :-** Use the asset where it is required on the page.
+
+---
+
+I hope you liked this article and explored sites and asset options in detail.
+
+In the next article, we will explore some additional features of components and their style guides.
+
+Thank you 🙏 !

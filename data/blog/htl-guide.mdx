@@ -1,0 +1,144 @@
+---
+title: 'Introduction to HTL in AEM: A Developer’s Guide'
+date: 2025-04-09T15:32:14Z
+lastmod: '2025-04-09'
+tags: ['aem', 'cms', htl, aemdeveloper]
+draft: false
+summary: 'Guide of HTL (HTML Template Language), formerly known as Sightly'
+layout: PostLayout
+---
+
+Hello Developers 🙌 , I’ll dive into the core benefits of `HTL` in AEM, how it streamlines front-end development, and why it’s becoming an essential tool for AEM developers. Whether you’re a seasoned AEM developer or new to the platform, understanding HTL will help you create dynamic, secure, and performance-optimized web applications
+
+Adobe Experience Manager (AEM) offers advanced templating capabilities, with HTL (HTML Template Language) standing out as the preferred method for creating dynamic and maintainable components. Introduced to replace **JSP (Java Server Pages)**, HTL improves security, readability, and efficiency in AEM development. It’s also known as `Sightly`.
+
+![HTL](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*shBWv5ozsOF7dYJ2kwsbKA.png)
+
+## Significance of HTL in AEM ?
+
+HTL offers a clean , HTML-centric syntax that makes it easier for front-end developers to work alongside backend logic without diving deep into Java. Below are some key benefits included:
+
+- **Improved Security —** Reduces risks related to XSS (cross-site scripting).
+- **Separation of Concerns —** Encourages clear distinction between markup and logic.
+- **Better Performance —** Faster rendering compared to JSP.
+- **Simplified Development —** Easy to learn and helps HTML developers get a better grasp on it.
+
+## What enables HTL to have a distinct syntax ?
+
+**1. Block Level Statement :** Block-level statements control the rendering of content based on conditions, loops, or resource inclusion.
+
+```javascript
+For Eg : data-sly-*
+```
+
+**2. Expression Language :** Expressions are used to output dynamic values within the markup. These expressions are enclosed in ${}.
+
+```javascript
+For example: ${properties.value}.
+```
+
+Now that you’ve learned about HTL, its execution, syntax, and creation, let’s explore some of the main properties and expressions we’ll use in our development path.
+
+The following is a list of some enumerable Java objects and Java backend objects that can be utilised in HTML via HTL.
+
+## Enumerable Objects
+
+- **properties :** Used when we want to extract value from components.
+
+```javascript
+For eg :- ${properties.value}
+```
+
+- **pageProperties :** Used when we want to extract value from page.
+
+```javascript
+For eg :- ${pageProperties.value}
+```
+
+- **inheritedPageProperties :** Used when we want to extract value from parent pages.
+
+```javascript
+For eg :- ${inheritedPageProperties.value}
+```
+
+## Java-backed Objects
+
+- **component :** Represents the current component.
+
+```javascript
+For eg :- <p>Component: ${component.title}</p>
+```
+
+- **currentPage :** Represents the current page in AEM.
+
+```javascript
+For eg :- <h1>Page Title: ${currentPage.title}</h1>
+```
+
+- **currentNode :** Provides access to the underlying JCR node of the current resource.
+
+```javascript
+For eg :- <p>Node Property: ${currentNode.getProperty("jcr:title")}</p>
+```
+
+- **currentStyle :** Retrieves style configurations from the design dialog.
+
+```javascript
+For eg:- ${currentStyle.backgroundColor}
+```
+
+- **request :** Provides access to the HTTP request.
+
+```javascript
+For eg :- <p>Request Path: ${request.requestURI}</p>
+```
+
+- **resource :** Represents the current resource.
+
+```javascript
+For eg :- <p>Resource Path: ${resource.path}</p>
+```
+
+> [!Note]
+> For more details and classes you can refer the official adobe link [here](https://experienceleague.adobe.com/en/docs/experience-manager-htl/content/global-objects).
+
+The following are some of the key block statements and examples that we will utilise during development.
+
+- **data-sly-test :** Used to determine whether a condition meets the criteria and render accordingly.
+
+```javascript
+For eg :- <p data-sly-test="${properties.title}">${properties.title}</p>.
+```
+
+- **data-sly-list :** Used to iterate through a list of values.
+
+- **data-sly-resource :** Used to include other components dynamically.
+
+```javascript
+For eg :- <div data-sly-resource="${'header' @ resourceType='/apps/myproject/components/header'}"></div>
+```
+
+- **data-sly-template :** Used to define the HTML file as a template so that we can call it in other files of the same component.
+
+```javascript
+For eg :- <template data-sly-template.heading="${@ title}"><h2>${title}</h2></template>
+```
+
+- **data-sly-call :** Used to call the defined template within the same component.
+
+```javascript
+For eg :- <div data-sly-call="${heading @ title='Welcome to AEM'}"></div>
+```
+
+- **data-sly-include :** Used to include the HTML files.
+
+```javascript
+For eg :- <div data-sly-include="footer.html"></div>
+```
+
+> [!Note]
+> For more details and other expression please check out this [link](https://github.com/adobe/htl-spec/blob/master/SPECIFICATION.md#22-available-block-statements)
+
+I hope you found my work informative and helpful in establishing the foundation for success in the path of AEM Developer. In the following post, we will develop our first component using the mentioned syntax and expression, so stay tuned for updates.
+
+Thank you 🙏 !

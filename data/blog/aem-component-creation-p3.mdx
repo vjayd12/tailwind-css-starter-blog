@@ -1,0 +1,442 @@
+---
+title: 'A Complete Guide for Component Development — Part 3'
+date: 2025-04-17T15:32:14Z
+lastmod: '2025-04-17'
+tags: ['aem', 'cms', archetype, aemdeveloper, component]
+draft: false
+summary: 'A Journey of Understanding AEM Components, Core Components, and Extended Components.'
+layout: PostLayout
+---
+
+Hello Developers 🙌 , This is a continuation of our last article series, where we rendered our first static component on the page with the help of the site. Here in this article, we will explore how we can make a component dynamic and what are the properties that leverage the component to get the values from the dialog box and render them on the UI. Also , we will explore how we can customize the component to adapt to the scalability of dynamic elements. We will be using the same component that we created in the last article, so do check out my last article .
+
+![Component Development](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*jwocV1Su2ui7fwsdh6AFog.png)
+
+## Let's get started with the next and final part of the series by converting the static component to dynamic.
+
+Our component will take input as a Image , Link , Text , Number, Textarea, and Dropdown.
+
+**Step 1 :-** Navigate to cq:dialog > content.xml file and update the code.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Dialog"
+    sling:resourceType="cq/gui/components/authoring/dialog">
+    <content
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="granite/ui/components/coral/foundation/container">
+        <items jcr:primaryType="nt:unstructured">
+            <max-cards
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/form/numberfield"
+                description="Please Enter the Number that be Showed"
+                step="1"
+                fieldLabel="Enter the Number Show "
+                name="./numbers" />
+            <noblogfound
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                fieldLabel="Enter the Title"
+                maxlength="12"
+                name="./title" />
+            <paragraph
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/form/textarea"
+                description="Please Enter the description of the field"
+                fieldLabel="Enter the Description"
+                required="true"
+                name="./description" />
+
+            <genderselection
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                fieldLabel="Select Gender"
+                name="./gendertype"
+            >
+                <items jcr:primaryType="nt:unstructured">
+                    <option1
+                        jcr:primaryType="nt:unstructured"
+                        text="Male"
+                        value="male" />
+                    <option2
+                        jcr:primaryType="nt:unstructured"
+                        text="Female"
+                        value="female" />
+                    <option3
+                        jcr:primaryType="nt:unstructured"
+                        text="Others"
+                        value="others" />
+
+                </items>
+            </genderselection>
+            <redirectionLink
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/foundation/form/pathbrowser"
+                roothPath="/content/aemtutorial"
+                fieldLabel="Enter the Redirection Path For CTA "
+                name="./redirectlink"
+            />
+            <image
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/form/pathbrowser"
+                fieldLabel="Enter Featured Image Path"
+                name="./image"
+                rootPath="/content/dam/" />
+
+
+        </items>
+    </content>
+</jcr:root>
+```
+
+Properties that are unique for each node from the above code :
+
+- **maxlength :** It provides the restriction to add the value.
+- **required :** It ensures that the respective node should have some value.
+- **text :** It shows the label for the dropdown.
+- **values :** It ensures the value to be bound from UI.
+- **roothPath :** It helps to get the starting directory path of an image or link.
+- **fieldLabel :** Label to be displayed on dialog box.
+
+> [!Note]
+> Every input node has distinct attributes; for more information, see this [link](https://developer.adobe.com/experience-manager/reference-materials/6-5/granite-ui/api/jcr_root/libs/granite/ui/components/coral/foundation/server.html).
+
+![Reference of cq:dialog and HTL mapping](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*rReXMqL6hFgeRnImzQKsTQ.png)
+**Step 2 :-** Copy the HTL which helps to make the component dynamic. If you have missed my HTL Guide article, please check it, this will help you get a better understanding of development.
+
+```html
+<div class="card">
+  <img src="${properties.image}" alt="Card Image" />
+  <div class="card-content">
+    Name :
+    <h3>${properties.title}</h3>
+    Number of Years on IT :
+    <p>${properties.numbers}</p>
+    Career background :
+    <p>${properties.description}</p>
+    Gender Type :
+    <p>${properties.gendertype}</p>
+    Redirection Link : <a href="${properties.redirectlink}">Click Here</a>
+    <button id="btn">Click to change color</button>
+  </div>
+</div>
+```
+
+> [!Note]
+> For data binding from cq:dialog to HTL we need to take name key of each node and bind to HTML.
+
+![HTML and HTL mapping](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*rReXMqL6hFgeRnImzQKsTQ.png)
+
+**Step 3 :-** Navigate to the page that we created and click on the wrench **(Config)** icon to author the value in dialog box.
+
+![Config Authoring](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*ZCmlpImt5aX1RInin18ibg.png)
+
+**Step 4 :-** The pop up that opens is called a Dialog Box in the authoring term.
+
+**Step 5 :-** Enter the value that you want to see on the UI.
+
+**Step 6 :-** Click on Hamburger and check the page in view as published.
+
+## Understanding the type of Component ?
+
+In AEM, generally we create two types of structured components ’s by understanding the pattern of Design Elements.
+
+- **`Singlefield Component :-`** A Single Field Component is used when the design doesn’t follow a repeating pattern in the HTML structure and each content element appears only once. These components are typically simple and standalone.
+  Eg.: - **Title, description, heading** ,etc
+
+- **`Multifield Component :-`** A Multifield Component is used when the design contains a repeating structure — like a pattern or group of similar elements. These are ideal for layouts that require multiple items of the same type, such as lists or grouped content blocks.
+  Eg.: - **Cards, Carousel banners,** etc.
+
+## Let’s look at how we construct a multifield component.
+
+**Step 1 :-** We will be updating the same HTML for multiple cards that we used for a single field but with different requirements. Here the requirement is to get multiple cards with the same design pattern.
+
+````HTL
+All the Data will be rendered dynamically with the help of Authoring capabilities of AEM.
+
+
+<sly data-sly-use.clientLib="/libs/granite/sightly/templates/clientlib.html"
+    data-sly-call="${clientlib.css @ categories='aemtutorials.demo'}" />
+
+<!-- Single Card Rendering Single Field -->
+<h1>Example of Single Field</h1>
+    <div class="card">
+        <img src="${properties.image}" alt="Card Image">
+        <div class="card-content">
+            Name : <h3>${properties.title}</h3>
+            Number of Years on IT : <p>${properties.numbers}</p>
+            Career background : <p>${properties.description}</p>
+            Gender Type : <p>${properties.gendertype}</p>
+            Redirection Link : <a href="${properties.redirectlink}.html">Click Here</a>
+            <button id="btn">Click to change color</button>
+        </div>
+    </div>
+
+<!-- Multiple Card Rendering Multifield -->
+
+<h1>Example of Multifield</h1>
+
+<div class="multicard">
+<sly data-sly-list="${resource.children}">
+    <sly data-sly-test="${item.name=='sourcecardField'}">
+        <sly data-sly-list="${item.children}">
+
+                <div class="card">
+                    <img src="${item.cardimage}" alt="Card Image">
+                    <div class="card-content">
+                        Name : <h3>${item.cardtitle}</h3>
+                        Number of Years on IT : <p>${item.cardnumbers}</p>
+                        Career background : <p>${item.carddescription}</p>
+                        Gender Type : <p>${item.cardgendertype}</p>
+                        Redirection Link : <a href="${item.cardredirectlink}.html">Click Here</a>
+                        <button id="btn" class="multicardclick">Click to change color</button>
+                    </div>
+                </div>
+        </sly>
+    </sly>
+</sly>
+</div>
+<sly data-sly-use.clientLib="/libs/granite/sightly/templates/clientlib.html"
+    data-sly-call="${clientlib.js @ categories='aemtutorials.demo'}" />
+    ```
+
+**Step 2 :-** Updation of cq:dialog as there is a new structure of HTML.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Dialog"
+    sling:resourceType="cq/gui/components/authoring/dialog">
+    <content
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="granite/ui/components/coral/foundation/container">
+        <items jcr:primaryType="nt:unstructured">
+            <tabs
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/coral/foundation/tabs"
+                maximized="{Boolean}true">
+                <items jcr:primaryType="nt:unstructured">
+                    <single-card
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Single Card"
+                        sling:resourceType="granite/ui/components/coral/foundation/container"
+                        margin="{Boolean}true">
+                        <items jcr:primaryType="nt:unstructured">
+                            <columns
+                                jcr:primaryType="nt:unstructured"
+                                sling:resourceType="granite/ui/components/coral/foundation/fixedcolumns"
+                                margin="{Boolean}true">
+                                <items jcr:primaryType="nt:unstructured">
+                                    <column
+                                        jcr:primaryType="nt:unstructured"
+                                        sling:resourceType="granite/ui/components/coral/foundation/container">
+                                        <items jcr:primaryType="nt:unstructured">
+                                            <max-cards
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/numberfield"
+                                                description="Please Enter the Number that be Showed"
+                                                fieldLabel="Enter the Number Show "
+                                                name="./numbers"
+                                                step="1" />
+                                            <noblogfound
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                                                fieldLabel="Enter the Title"
+                                                maxlength="12"
+                                                name="./title" />
+                                            <paragraph
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/textarea"
+                                                description="Please Enter the description of the field"
+                                                fieldLabel="Enter the Description"
+                                                name="./description"
+                                                required="true" />
+                                            <genderselection
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                                                fieldLabel="Select Gender"
+                                                name="./gendertype">
+                                                <items jcr:primaryType="nt:unstructured">
+                                                    <option1
+                                                        jcr:primaryType="nt:unstructured"
+                                                        text="Male"
+                                                        value="male" />
+                                                    <option2
+                                                        jcr:primaryType="nt:unstructured"
+                                                        text="Female"
+                                                        value="female" />
+                                                    <option3
+                                                        jcr:primaryType="nt:unstructured"
+                                                        text="Others"
+                                                        value="others" />
+                                                </items>
+                                            </genderselection>
+                                            <redirectionLink
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/foundation/form/pathbrowser"
+                                                fieldLabel="Enter the Redirection Path For CTA "
+                                                name="./redirectlink"
+                                                roothPath="/content/aemtutorial" />
+                                            <image
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/pathbrowser"
+                                                fieldLabel="Enter Featured Image Path"
+                                                name="./image"
+                                                rootPath="/content/dam/" />
+                                        </items>
+                                    </column>
+                                </items>
+                            </columns>
+                        </items>
+                    </single-card>
+                    <multi-cards
+                        jcr:primaryType="nt:unstructured"
+                        jcr:title="Multi Cards"
+                        sling:resourceType="granite/ui/components/coral/foundation/container"
+                        margin="{Boolean}true">
+                        <items jcr:primaryType="nt:unstructured">
+                            <columns
+                                jcr:primaryType="nt:unstructured"
+                                sling:resourceType="granite/ui/components/coral/foundation/fixedcolumns"
+                                margin="{Boolean}true">
+                                <items jcr:primaryType="nt:unstructured">
+                                    <column
+                                        jcr:primaryType="nt:unstructured"
+                                        sling:resourceType="granite/ui/components/coral/foundation/container">
+                                        <items jcr:primaryType="nt:unstructured">
+
+                                            <cardmultifiedld
+                                                jcr:primaryType="nt:unstructured"
+                                                sling:resourceType="granite/ui/components/coral/foundation/form/multifield"
+                                                composite="{Boolean}true"
+                                                fieldLabel="Card Multifield">
+                                                <field
+                                                    jcr:primaryType="nt:unstructured"
+                                                    sling:resourceType="granite/ui/components/coral/foundation/form/fieldset"
+                                                    name="./sourcecardField">
+                                                    <items jcr:primaryType="nt:unstructured">
+                                                        <column
+                                                            jcr:primaryType="nt:unstructured"
+                                                            sling:resourceType="granite/ui/components/coral/foundation/container">
+                                                            <items jcr:primaryType="nt:unstructured">
+                                                                <max-cards
+                                                                    jcr:primaryType="nt:unstructured"
+                                                                    sling:resourceType="granite/ui/components/coral/foundation/form/numberfield"
+                                                                    description="Please Enter the Number that be Showed"
+                                                                    fieldLabel="Enter the Number Show "
+                                                                    name="./cardnumbers"
+                                                                    step="1" />
+                                                                <noblogfound
+                                                                    jcr:primaryType="nt:unstructured"
+                                                                    sling:resourceType="granite/ui/components/coral/foundation/form/textfield"
+                                                                    fieldLabel="Enter the Title"
+                                                                    maxlength="12"
+                                                                    name="./cardtitle" />
+                                                                <paragraph
+                                                                    jcr:primaryType="nt:unstructured"
+                                                                    sling:resourceType="granite/ui/components/coral/foundation/form/textarea"
+                                                                    description="Please Enter the description of the field"
+                                                                    fieldLabel="Enter the Description"
+                                                                    name="./carddescription"
+                                                                    required="true" />
+                                                                <genderselection
+                                                                    jcr:primaryType="nt:unstructured"
+                                                                    sling:resourceType="granite/ui/components/coral/foundation/form/select"
+                                                                    fieldLabel="Select Gender"
+                                                                    name="./cardgendertype">
+                                                                    <items
+                                                                        jcr:primaryType="nt:unstructured">
+                                                                        <option1
+                                                                            jcr:primaryType="nt:unstructured"
+                                                                            text="Male"
+                                                                            value="male" />
+                                                                        <option2
+                                                                            jcr:primaryType="nt:unstructured"
+                                                                            text="Female"
+                                                                            value="female" />
+                                                                        <option3
+                                                                            jcr:primaryType="nt:unstructured"
+                                                                            text="Others"
+                                                                            value="others" />
+                                                                    </items>
+                                                                </genderselection>
+                                                                <redirectionLink
+                                                                    jcr:primaryType="nt:unstructured"
+                                                                    sling:resourceType="granite/ui/components/foundation/form/pathbrowser"
+                                                                    fieldLabel="Enter the Redirection Path For CTA "
+                                                                    name="./cardredirectlink"
+                                                                    roothPath="/content/aemtutorial" />
+                                                                <image
+                                                                    jcr:primaryType="nt:unstructured"
+                                                                    sling:resourceType="granite/ui/components/coral/foundation/form/pathbrowser"
+                                                                    fieldLabel="Enter Featured Image Path"
+                                                                    name="./cardimage"
+                                                                    rootPath="/content/dam/" />
+                                                            </items>
+                                                        </column>
+                                                    </items>
+                                                </field>
+                                            </cardmultifiedld>
+
+                                        </items>
+                                    </column>
+                                </items>
+                            </columns>
+                        </items>
+                    </multi-cards>
+
+
+                </items>
+            </tabs>
+
+        </items>
+    </content>
+</jcr:root>
+````
+
+**Step 4 :-** Update CSS and JS if required (optional).
+
+```Javascript
+// Javascript
+const buttons = document.querySelectorAll(".multicardclick");
+
+// Loop through each button and add a click event
+buttons.forEach(button => {
+    button.addEventListener("click", function() {
+      this.style.color= "black";
+    this.style.background= "yellow"
+    });
+});
+```
+
+```css
+//CSS
+.multicard {
+  display: flex;
+  flex-direction: row;
+  align-content: space-evenly;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+```
+
+**Step 5 :-** Go to the editor mode of the page and author the dialog by clicking add CTA in tab two. You can add multiple cards by clicking add.
+
+![Dialog Box](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*arCvq7uLQj5o_hUPGwhb9Q.png)
+
+**Step 6 :-** Add all the value as per your need and validate it by viewing as published.
+
+![published Page](https://miro.medium.com/v2/resize:fit:4800/format:webp/1*tdK6NOEeg_7kcmn2OHl_pg.png)
+
+> [!Note]
+> If you have faced any challenges or issue you can refer to this github link.
+> Checkout to `feature/multifield-component` branch for all the codes.
+
+Finally, 🤗 !! We have completed this series and will be able to create customised components on our own. Congratulations on your success 🎖️.
+
+Thank you 🙏 !
