@@ -1,0 +1,122 @@
+---
+title: 'User-Based vs Service-Based Sessions in AEM: A Deep Dive'
+date: 2026-06-19T15:32:14Z
+lastmod: '2026-06-19'
+tags: ['aem', 'aemdeveloper', 'backend', 'java', 'osgi', 'security']
+draft: false
+summary: 'A deep dive into the two approaches for JCR session management in AEM — understanding when to use user-based vs service-based sessions, and why service sessions are the modern best practice.'
+layout: PostLayout
+---
+
+Hey Folks 👋 , In this article we will explore a fundamental choice in AEM backend development — selecting between **user-based** and **service-based sessions** for accessing the Java Content Repository (JCR). Getting this right is critical for security, scalability, and compatibility with AEM as a Cloud Service.
+
+## What is a Session in AEM?
+
+A **session** represents a connection that enables read/write operations on repository content. The method you use to acquire a session determines its scope, permissions, security implications, and associated risks.
+
+## User-Based Sessions
+
+A user-based session is established using the credentials of an actual AEM user — typically `admin` or a content author account.
+
+```java
+Session session = repository.login(
+    new SimpleCredentials("admin", "admin".toCharArray())
+);
+```
+
+### Characteristics
+
+- Convenient for prototyping and local testing
+- Common in legacy AEM implementations
+- **Not recommended for production environments**
+
+### Why You Should Avoid Them
+
+- **Hardcoded credentials** create serious security vulnerabilities
+- **Difficult to audit** — activity is attributed to a real user account, not a service
+- **AEM Cloud Service prohibits administrative login** — code using `admin` credentials will fail in cloud deployments
+- Violates the **principle of least privilege** — `admin` has access to everything
+
+## Service-Based Sessions (Recommended)
+
+A service-based session is a secure, system-level session designed for background processes. It uses a dedicated **system user** with only the permissions it needs — no actual user credentials required.
+
+### Advantages
+
+- Implements the **least-privilege principle** — only grant what the service needs
+- **Optimised for multi-tenant environments** like AEM Cloud Service
+- **Required for AEM Cloud Service** — the only supported approach
+- **Enhanced auditability** — all actions are attributed to the named system user
+
+## Implementation: Step-by-Step
+
+**Step 1 :-** Configure the `ServiceUserMapper` in `ui.config`. This maps your bundle to a system user:
+
+```json
+// org.apache.sling.serviceusermapping.impl.ServiceUserMapperImpl.amended~aemtutorial.cfg.json
+{
+  "user.mapping": [
+    "aemtutorial.core:subServiceName=aemtut"
+  ]
+}
+```
+
+**Mapping breakdown:**
+- `aemtutorial.core` = your bundle name
+- `subServiceName` = the key used in your Java code
+- `aemtut` = the actual system user name
+
+**Step 2 :-** Set ACL permissions for the system user via `RepositoryInitializer`:
+
+```json
+// org.apache.sling.jcr.repoinit.RepositoryInitializer~aemtutorial.cfg.json
+{
+  "scripts": [
+    "create service user aemtut\r\nset ACL on /content\r\nallow jcr:read for aemtut\r\nend"
+  ]
+}
+```
+
+> [!Note]
+> Grant only the minimum permissions required. If your service only reads content, use `jcr:read` — not `jcr:all`.
+
+**Step 3 :-** Obtain a session in your OSGi service using `ResourceResolverFactory`:
+
+```java
+@Reference
+private ResourceResolverFactory resolverFactory;
+
+public void execute() {
+    Map<String, Object> param = new HashMap<>();
+    param.put(ResourceResolverFactory.SUBSERVICE, "subServiceName");
+
+    try (ResourceResolver resolver = resolverFactory.getServiceResourceResolver(param)) {
+        Session session = resolver.adaptTo(Session.class);
+
+        // perform JCR operations
+        Resource resource = resolver.getResource("/content/aemtutorial/us/en");
+        if (resource != null) {
+            log.info("Page title: {}", resource.getValueMap().get("jcr:title", String.class));
+        }
+
+    } catch (LoginException e) {
+        log.error("Failed to obtain service resolver", e);
+    }
+}
+```
+
+## Side-by-Side Comparison
+
+| Aspect | User-Based | Service-Based |
+|---|---|---|
+| Credentials | Real user (e.g. `admin`) | System user (no password) |
+| Security | Poor — hardcoded credentials | Strong — least privilege |
+| AEM Cloud Service | Not supported | Required |
+| Auditability | Attributed to a real user | Attributed to the service |
+| Recommended For | Local dev/testing only | All production use cases |
+
+## Conclusion
+
+Service-based sessions are the modern best practice for JCR access in AEM. They ensure secure, maintainable, and scalable applications — and are the only option in AEM as a Cloud Service.
+
+If you have any legacy code using `SimpleCredentials("admin", ...)`, now is the time to migrate it to the service-user pattern. Your future self (and your security team) will thank you! 🚀
