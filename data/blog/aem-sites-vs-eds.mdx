@@ -1,0 +1,97 @@
+---
+title: 'Speed vs Power: AEM Sites vs EDS — Which One Should You Use?'
+date: 2025-06-17T15:32:14Z
+lastmod: '2025-06-17'
+tags: ['aem', 'eds', 'aemdeveloper', 'edgedelivery', 'cms']
+draft: false
+summary: 'A clear comparison of traditional AEM Sites and Edge Delivery Services (EDS) — when to use each, key technical differences, and how they complement each other.'
+layout: PostLayout
+---
+
+Hey Folks 👋 , In this article we will compare two powerful approaches within the AEM ecosystem — **traditional AEM Sites** and the newer **Edge Delivery Services (EDS)**. This is a significant evolution in Adobe's digital experience platform strategy, and understanding when to use each is a key skill for modern AEM developers.
+
+## 1. Edge Delivery Services (EDS)
+
+### What is EDS?
+
+EDS represents Adobe's modern, edge-first delivery solution within AEM as a Cloud Service. It follows a **headless, content-as-a-service** model where content authoring happens through familiar tools like **Google Docs** or **Microsoft Word**, then deploys through edge networks like Fastly for rapid delivery.
+
+### Key Technical Features
+
+- Document-based authoring (Docs/Sheets synced to GitHub)
+- GitHub serves as the content repository
+- Static Site Generation paired with Server-Side Rendering
+- CDN edge node distribution globally
+- Lightweight development stack (HTML, CSS, JavaScript — no Java or HTL required)
+
+### Ideal Use Cases
+
+- Marketing microsites
+- SEO-focused landing pages
+- Campaign-specific pages
+- Public pages requiring fast loading times
+- Projects where the team is more comfortable with web technologies than AEM/Java
+
+## 2. Traditional AEM Sites
+
+### What is AEM Sites?
+
+AEM Sites is the classical AEM approach — a **robust, enterprise-grade CMS** designed for large organizations with complex, scalable website requirements. It features built-in personalization, workflow management, and deep Adobe ecosystem integration.
+
+### Key Technical Features
+
+- JCR-based content storage
+- WYSIWYG editor via AEM Touch UI
+- HTL/Sling/Java component architecture
+- Backend-driven rendering with optional CDN layer
+- Deep integration with Adobe Analytics, Target, and Campaign
+
+### Ideal Use Cases
+
+- Large enterprise websites
+- Personalization and targeting initiatives
+- Multi-language and multi-site management (MSM)
+- Adobe Analytics and Target integration
+- Complex workflows and approval processes
+
+## Side-by-Side Comparison
+
+| Feature | AEM Sites | Edge Delivery Services |
+|---|---|---|
+| Authoring Tool | AEM Touch UI | Google Docs / Word |
+| Content Storage | JCR Repository | GitHub |
+| Rendering | Server-side (Java/HTL) | Edge / Static |
+| Developer Stack | Java, HTL, Sling | HTML, CSS, JavaScript |
+| Performance | Good (with CDN) | Excellent (edge-native) |
+| Personalization | Built-in (Adobe Target) | Via external APIs |
+| Best For | Enterprise, complex sites | Marketing, fast-loading pages |
+
+## How They Work Together
+
+EDS doesn't replace traditional AEM Sites — it **complements** the ecosystem. A common pattern is:
+
+- **EDS** handles lightweight, static, or frequently updated marketing content (landing pages, campaign sites)
+- **AEM Sites** manages the core enterprise website with personalization, workflows, and multi-site management
+
+This hybrid approach reduces load on the main AEM instance while improving performance and scalability across omnichannel touchpoints — websites, mobile apps, kiosks, smart devices.
+
+## Which One Should You Use?
+
+Choose **EDS** when:
+- You need extreme performance (Core Web Vitals are critical)
+- Authoring team is non-technical and prefers Docs/Word
+- You're building marketing microsites or landing pages
+- Minimal infrastructure management is a priority
+- You need rapid deployment cycles
+
+Choose **AEM Sites** when:
+- Complex business logic or workflows are required
+- You need built-in personalization with Adobe Target
+- Multi-site or multi-language management (MSM) is needed
+- Deep integration with the Adobe Experience Cloud stack is required
+
+## Conclusion
+
+EDS delivers **performance + simplicity + scalability**, making it ideal for projects requiring extreme speed. AEM Sites delivers **power + flexibility + integration**, making it ideal for enterprise complexity.
+
+The smart move for most organizations is not choosing one over the other — it's knowing where each shines. 🚀

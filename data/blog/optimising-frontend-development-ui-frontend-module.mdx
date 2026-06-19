@@ -1,0 +1,91 @@
+---
+title: 'Optimising Frontend Development: ui.frontend Module'
+date: 2025-05-01T15:32:14Z
+lastmod: '2025-05-01'
+tags: ['aem', 'cms', 'aemdeveloper', 'webpack', 'frontend']
+draft: false
+summary: 'A deep dive into the AEM ui.frontend module — leveraging Webpack, Node.js, ES6, and TypeScript to optimise CSS and JavaScript compilation for modern frontend development.'
+layout: PostLayout
+---
+
+Hey Folks 👋 , In this article we will explore the `ui.frontend` module in Adobe Experience Manager (AEM) — an out-of-the-box (OOTB) feature designed for fast, robust, and optimised frontend development. It leverages cutting-edge technologies such as **Webpack**, **Node.js**, **ES6**, and **TypeScript** to optimise CSS/JS compilation and bridge the gap between traditional AEM development and modern frontend practices.
+
+## What is the ui.frontend Module?
+
+The `ui.frontend` module is Adobe's recommended approach for managing frontend assets in AEM projects. It provides a structured workspace for developing components, managing dependencies, and compiling optimised clientlibs that are deployed to the `ui.apps` module.
+
+## Key Files and Folders
+
+Understanding the module structure is the first step to working with it effectively.
+
+**`dist`** — Output directory where compiled clientlib folders are generated after running `npm run dev`. This is what gets transferred to `ui.apps`.
+
+**`node`** — Configuration folder for SPA projects (React/Vue.js) that supports runtime environment generation and local validation.
+
+**`node_modules`** — Contains all dependencies declared in `package.json` as installed packages.
+
+**`src`** — The primary development workspace for components, assets, clientlibs, and static files including `index.html`.
+
+**`clientlib.config.js`** — Configuration file that manages the migration of generated clientlibs from `ui.frontend` to `ui.apps` using `aem-clientlib-generator`.
+
+**`package.json`** — Dependency declaration file that also enables custom script execution (e.g. `npm run dev`, `npm run build`).
+
+**`webpack.*.js`** — Bundler configuration files that optimise JS and CSS output during project builds. Typically split into `webpack.common.js`, `webpack.dev.js`, and `webpack.prod.js`.
+
+## Creating Clientlibs: Step-by-Step Process
+
+Here is the end-to-end workflow for creating and deploying a new clientlib using the `ui.frontend` module.
+
+**Step 1 :-** Create the clientlib folder structure inside the `src` directory. Typically this follows the pattern `src/main/webpack/clientlibs/<clientlib-name>/`.
+
+**Step 2 :-** Update ESLint configuration if needed, especially if you are introducing new JS patterns or TypeScript.
+
+**Step 3 :-** Register the new clientlib entry in `clientlib.config.js`. Define the `categories`, `allowProxy`, and asset paths so `aem-clientlib-generator` knows how to map it.
+
+```js
+// clientlib.config.js example entry
+{
+  name: 'clientlib-custom',
+  categories: ['my-project.custom'],
+  assets: {
+    js: { cwd: 'clientlib-custom', files: ['**/*.js'] },
+    css: { cwd: 'clientlib-custom', files: ['**/*.css'] }
+  }
+}
+```
+
+**Step 4 :-** Update `webpack.common.js` with the new component or clientlib entry point so Webpack knows to bundle it.
+
+```js
+// webpack.common.js entry addition
+entry: {
+  'clientlib-custom': './src/main/webpack/clientlibs/clientlib-custom/index.js'
+}
+```
+
+**Step 5 :-** Execute the build command to compile assets and generate clientlibs in the `dist` folder.
+
+```bash
+npm run dev
+```
+
+**Step 6 :-** Validate the output in the `ui.apps` directory. You should see the generated clientlib folder under `ui.apps/src/main/content/jcr_root/apps/<project>/clientlibs/`.
+
+**Step 7 :-** Apply the clientlib at the template level in AEM by adding the category to the page policy or including it in the template's clientlib configuration.
+
+> [!Note]
+> Make sure your AEM instance is running and the `ui.apps` module is deployed before validating the clientlib output. You can use **AEM Sync** or **vscode AEM Sync** extensions to auto-deploy on file save.
+
+## Why Use ui.frontend?
+
+- **Modern tooling** — Webpack, Babel, TypeScript support out of the box
+- **Optimised output** — Minification, tree-shaking, and code splitting
+- **Separation of concerns** — Frontend code lives independently from JCR content
+- **SPA ready** — Supports React and Vue.js setups with the `node` configuration folder
+- **Consistent workflow** — Standardised npm scripts across all AEM projects following Adobe's archetype
+
+## Conclusion
+
+A properly configured `ui.frontend` module bridges traditional AEM development with modern frontend practices. It enhances developer efficiency, enforces consistency, and ensures projects meet current web standards. As AEM continues to evolve toward headless architectures and SPAs, the `ui.frontend` module's role will only grow in importance.
+
+You can find the full code examples on the GitHub repository under the `feature/ui-frontend` branch.

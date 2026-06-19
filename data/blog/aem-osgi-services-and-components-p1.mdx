@@ -1,0 +1,176 @@
+---
+title: 'AEM OSGi Services and Components — Part 1'
+date: 2025-06-11T15:32:14Z
+lastmod: '2025-06-11'
+tags: ['aem', 'osgi', 'aemdeveloper', 'backend', 'java']
+draft: false
+summary: 'A hands-on guide to creating OSGi services in AEM — covering system user creation, RepoInit configuration, ResourceResolver service, and a practical page data fetcher component.'
+layout: PostLayout
+---
+
+Hey Folks 👋 , In this article we will build real OSGi services in AEM! Before diving in, make sure you've read my previous article on OSGi fundamentals — it covers the annotations and bundle lifecycle concepts we'll be using here.
+
+We will build a service that reads JCR content using a system user and logs the page title and description — a practical pattern you'll use in almost every AEM project.
+
+## System User Creation and RepoInit
+
+When performing JCR CRUD operations in AEM, a **system user** is essential for establishing authenticated sessions. **RepoInit** is a configuration scripting language that streamlines repository setup by automating user creation and permission management across all environments.
+
+### File 1 — Repository Initialization
+
+Location: `ui.config/src/main/content/jcr_root/apps/aemtutorial/osgiconfig/config/org.apache.sling.jcr.repoinit.RepositoryInitializer~aemtutorial.cfg.json`
+
+```json
+{
+  "scripts": [
+    "create service user aemtut\r\nset ACL on /,/content,/etc,/var,/home\r\nallow jcr:all for aemtut\r\nend"
+  ]
+}
+```
+
+### File 2 — Service User Mapping
+
+Location: `ui.config/src/main/content/jcr_root/apps/aemtutorial/osgiconfig/config/org.apache.sling.serviceusermapping.impl.ServiceUserMapperImpl.amended~aemtutorial.cfg.json`
+
+```json
+{
+  "user.mapping": [
+    "aemtutorial.core:subServiceName=aemtut"
+  ]
+}
+```
+
+**Mapping breakdown:**
+- `aemtutorial.core` = Bundle name
+- `subServiceName` = The key used in code when calling `getServiceResourceResolver`
+- `aemtut` = The actual system user
+
+## Creating the ResourceResolver Service
+
+**Step 1 :-** Create a dedicated `service` package in the Core module.
+
+**Step 2 :-** Define the `ResourceHelper` interface:
+
+```java
+package com.aemtutorial.core.service;
+
+import javax.jcr.RepositoryException;
+import org.apache.sling.api.resource.LoginException;
+import org.apache.sling.api.resource.ResourceResolver;
+
+public interface ResourceHelper {
+    ResourceResolver getResourceResolver() throws RepositoryException, LoginException;
+}
+```
+
+**Step 3 :-** Implement `ResourceHelperImpl`:
+
+```java
+package com.aemtutorial.core.service.impl;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.sling.api.resource.ResourceResolver;
+import org.apache.sling.api.resource.ResourceResolverFactory;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import com.aemtutorial.core.service.ResourceHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Component(service = ResourceHelper.class)
+public class ResourceHelperImpl implements ResourceHelper {
+
+    private static final Logger log = LoggerFactory.getLogger(ResourceHelperImpl.class);
+
+    @Reference
+    ResourceResolverFactory resourceResolverFactory;
+
+    @Override
+    public ResourceResolver getResourceResolver() throws org.apache.sling.api.resource.LoginException {
+        Map<String, Object> map = new HashMap<>();
+        map.put(ResourceResolverFactory.SUBSERVICE, "subServiceName");
+        return resourceResolverFactory.getServiceResourceResolver(map);
+    }
+}
+```
+
+> [!Note]
+> Don't forget to include a `package-info.java` file in your service package to register it with the OSGi framework.
+
+## OSGi Component: Page Data Fetcher
+
+This component activates on bundle start, retrieves page title and description from the JCR, and logs them using a custom logger.
+
+```java
+@Component(immediate = true, name = "Simple Component")
+public class SimpleComponentImpl extends SlingAllMethodsServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(SimpleComponentImpl.class);
+
+    @Reference
+    private ResourceHelper resourceHelper;
+
+    private static final String PAGE_PATH = "/content/aemtutorial/us/en/jcr:content";
+
+    private String getProperty(Node node, String propertyName) {
+        try {
+            if (node.hasProperty(propertyName)) {
+                return node.getProperty(propertyName).getString();
+            }
+        } catch (RepositoryException e) {
+            logger.error("Error retrieving property: {}", propertyName, e);
+        }
+        return "N/A";
+    }
+
+    @Activate
+    public void activate() {
+        logger.info("Bundle activated.");
+        ResourceResolver resourceResolver = null;
+        try {
+            resourceResolver = resourceHelper.getResourceResolver();
+            Session session = resourceResolver.adaptTo(Session.class);
+
+            Resource pageResource = resourceResolver.getResource(PAGE_PATH);
+            if (pageResource == null) {
+                logger.info("No page found at path: {}", PAGE_PATH);
+                return;
+            }
+
+            Node node = pageResource.adaptTo(Node.class);
+            if (node == null) {
+                logger.info("No JCR node available at path: {}", PAGE_PATH);
+                return;
+            }
+
+            String title = getProperty(node, "jcr:title");
+            String description = getProperty(node, "jcr:description");
+
+            logger.info("Page Data -> Title: {}, Description: {}", title, description);
+
+        } catch (RepositoryException e) {
+            logger.error("Error fetching JCR data", e);
+        } catch (LoginException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (resourceResolver != null) {
+                resourceResolver.close();
+            }
+        }
+    }
+
+    @Deactivate
+    public void deactivate() {
+        logger.info("Bundle deactivated.");
+    }
+}
+```
+
+## Conclusion
+
+OSGi services provide a standardized, modular approach for managing business logic, utility classes, and third-party integrations. The `ResourceHelper` pattern shown here is something you'll reuse across many AEM projects.
+
+You can find the complete code on GitHub under the `feature/OSGi-Component-Creation` branch.
+
+In **Part 2**, we will explore **Object Class Definition (OCD)** for runtime-configurable OSGi services. Stay tuned! 🚀

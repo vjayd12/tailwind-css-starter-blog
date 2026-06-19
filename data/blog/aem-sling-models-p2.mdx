@@ -1,0 +1,147 @@
+---
+title: 'Understanding AEM Sling Models: A Complete Guide for Developers — Part 2'
+date: 2025-05-19T15:32:14Z
+lastmod: '2025-05-19'
+tags: ['aem', 'sling', 'aemdeveloper', 'backend', 'java']
+draft: false
+summary: 'A hands-on implementation guide for AEM Sling Models — building a real component with dialog, multifield, custom PostConstruct logic, and HTL integration.'
+layout: PostLayout
+---
+
+Fantastic stuff 🎉 ! We covered all the key Sling Model annotations in Part 1. Now it's time to build a real-world component that retrieves dialog data and renders the current page title. If you haven't read Part 1 yet, please check it out first — it will make this implementation much easier to follow.
+
+## What We Are Building
+
+A `slingmodeldemo` component with:
+- A single-card section (title + description)
+- A multifield section (list of cards with image and link)
+- Custom `@PostConstruct` logic to fetch the current page title
+
+## Step-by-Step Implementation
+
+**Step 1 :-** Create a component named `slingmodeldemo` in CRXDE Lite under `apps/<project>/components/custom-components/`.
+
+**Step 2 :-** Configure the `cq:dialog` with two tabs:
+
+- **Single Card Tab** — textfield for title (max 12 characters) and textarea for description
+- **Multi Cards Tab** — multifield containing composite fields for card title, card description, featured image path browser, and redirection link path browser
+
+**Step 3 :-** Create the primary Sling Model class:
+
+```java
+@Model(
+  adaptables = SlingHttpServletRequest.class,
+  defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL
+)
+public class SlingModelDemoModel {
+
+    @ValueMapValue
+    private String title;
+
+    @ValueMapValue
+    private String description;
+
+    @ChildResource
+    @Via("resource")
+    private List<Resource> sourcecardField;
+
+    @SlingObject
+    private ResourceResolver resourceResolver;
+
+    @SlingObject
+    private Resource currentResource;
+
+    private String processedData;
+
+    @PostConstruct
+    protected void init() {
+        PageManager pageManager = resourceResolver.adaptTo(PageManager.class);
+        if (pageManager != null) {
+            Page currentPage = pageManager.getContainingPage(currentResource);
+            if (currentPage != null) {
+                processedData = "Current Page: " + currentPage.getTitle();
+            }
+        }
+    }
+
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
+    public String getProcessedData() { return processedData; }
+    public List<Resource> getSourcecardField() { return sourcecardField; }
+}
+```
+
+**Step 4 :-** Create a separate model class for multifield items:
+
+```java
+@Model(
+  adaptables = Resource.class,
+  defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL
+)
+public class CardItemModel {
+
+    @ValueMapValue
+    private String cardtitle;
+
+    @ValueMapValue
+    private String carddescription;
+
+    @ValueMapValue
+    private String cardimage;
+
+    @ValueMapValue
+    private String cardredirectlink;
+
+    public String getCardtitle() { return cardtitle; }
+    public String getCarddescription() { return carddescription; }
+    public String getCardimage() { return cardimage; }
+    public String getCardredirectlink() { return cardredirectlink; }
+}
+```
+
+**Step 5 :-** Create the HTL template (`slingmodeldemo.html`):
+
+```html
+<sly data-sly-use.model="com.aemtutorial.core.models.SlingModelDemoModel">
+    <div class="sling-demo">
+        <p>${model.processedData}</p>
+        <h2>${model.title}</h2>
+        <p>${model.description}</p>
+
+        <div class="cards">
+            <sly data-sly-list.item="${model.sourcecardField}">
+                <sly data-sly-use.card="${'com.aemtutorial.core.models.CardItemModel' @ adaptTo=item}">
+                    <div class="card">
+                        <img src="${card.cardimage}" alt="${card.cardtitle}" />
+                        <h3>${card.cardtitle}</h3>
+                        <p>${card.carddescription}</p>
+                        <a href="${card.cardredirectlink}">Read More</a>
+                    </div>
+                </sly>
+            </sly>
+        </div>
+    </div>
+</sly>
+```
+
+**Step 6 :-** Author the component on a page by dragging it into the parsys and filling in the dialog fields.
+
+**Step 7 :-** Publish the page and validate the rendered output — you should see the processed page title, authored single card fields, and all multifield card iterations.
+
+> [!Note]
+> Make sure your AEM instance is running and the project is deployed before testing. Use **AEM Sync** or **vscode AEM Sync** for auto-deployment on file save.
+
+## Key Advantages of Sling Models
+
+1. **Annotation-Based Approach** — Replaces verbose Java objects with clean, declarative code
+2. **Dependency Injection** — OSGi services like `ResourceResolver` and `PageManager` integrate seamlessly
+3. **Adobe Best Practices** — Recommended approach for all current AEM development
+4. **Performance Optimization** — Built-in caching and lazy loading capabilities
+5. **Code Maintainability** — Clean separation of backend logic from HTL templates
+6. **HTL Compatibility** — Direct property binding via getter methods
+
+## Conclusion
+
+Sling Models deliver a cleaner, more flexible alternative to traditional `WCMUsePojo` approaches. This guide demonstrated a complete implementation combining dialog authoring, model injection, custom logic processing, and template rendering.
+
+You can find the complete source code on the GitHub repository under the `feature/sling-model` branch. In **Part 3**, we will explore Jackson Exporter to expose Sling Model content as JSON for headless use cases. 🚀

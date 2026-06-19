@@ -1,0 +1,116 @@
+---
+title: 'Understanding AEM Sling Models: A Complete Guide for Developers — Part 1'
+date: 2025-05-06T15:32:14Z
+lastmod: '2025-05-06'
+tags: ['aem', 'sling', 'aemdeveloper', 'backend', 'java']
+draft: false
+summary: 'A comprehensive guide to Sling Models in AEM — covering all key annotations, best practices, and how they simplify backend development.'
+layout: PostLayout
+---
+
+Hey Folks 👋 , In this article we will explore **Sling Models** — the backbone of AEM backend development. Sling is a RESTful web application framework that supports AEM's content-centric design, allowing for easy development and maintenance of content-oriented apps by mapping data from the JCR (Java Content Repository) to Java objects.
+
+Before we dive in, make sure you have a basic understanding of AEM component creation. Check out my previous articles in this series if you haven't already!
+
+## What are Sling Models?
+
+Sling Models provide a modern, annotation-based approach to map JCR content, request attributes, and OSGi services directly into Java objects. They replace older approaches like `WCMUsePojo` with cleaner, more maintainable code.
+
+## Key Annotations Explained
+
+### `@Model`
+Declares a class as a Sling Model. Accepts parameters like `adaptables` (supporting `Resource.class` or `SlingHttpServletRequest.class`) and `resourceType` for restricting to specific resource types.
+
+```java
+@Model(adaptables = SlingHttpServletRequest.class,
+       defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
+public class MyModel { }
+```
+
+### `@Inject`
+Maps JCR properties, request attributes, or OSGi services to class fields, handling dependency injection in Sling Models.
+
+### `@ValueMapValue`
+Alternative to `@Inject` for mapping JCR properties. This is the **recommended best practice** due to enhanced security and default value support.
+
+```java
+@ValueMapValue
+private String title;
+```
+
+### `@SlingHttpServletRequest`
+Injects the current HTTP request object, enabling retrieval of request parameters and headers.
+
+### `@Named`
+Specifies replacement property names when variable names differ from JCR properties.
+
+```java
+@ValueMapValue
+@Named("jcr:title")
+private String pageTitle;
+```
+
+### `@Self`
+Adapts to the class itself, injecting the current resource or request. Useful for accessing additional resource or request methods.
+
+### `@Via`
+Specifies the adaptation method when injecting values, providing alternative paths to access values.
+
+```java
+@ValueMapValue
+@Via("resource")
+private String description;
+```
+
+### `@RequestAttribute`
+Retrieves request attributes from HTTP requests, particularly useful for Ajax query parameters.
+
+### `@ChildResource`
+Navigates content hierarchy within Sling Models, beneficial when working with multifield components.
+
+```java
+@ChildResource
+private List<Resource> cards;
+```
+
+### `@SlingObject`
+Injects commonly used Sling objects like request, response, resource resolver, current resource, or `SlingScriptHelper` when field types match.
+
+```java
+@SlingObject
+private ResourceResolver resourceResolver;
+```
+
+### `@OSGiService`
+Injects OSGi services into Sling Models with automatic service management by the OSGi runtime.
+
+```java
+@OSGiService
+private PageManager pageManager;
+```
+
+### `@PostConstruct`
+Defines initialization methods executed after all injections complete, supporting business logic setup and value modifications.
+
+```java
+@PostConstruct
+protected void init() {
+    // business logic after all injections
+}
+```
+
+## Best Practices
+
+- Prefer `@ValueMapValue` over `@Inject` for JCR properties
+- Employ `@PostConstruct` for business logic initialization
+- Use `@Self` to inject current resource or request
+- Apply `@Via("resource")` to adapt fields from resources
+- Utilize `@RequestAttribute` for request parameters instead of direct `SlingHttpServletRequest` access
+- Implement Lombok when extending core components via delegation
+- Prioritize Sling Models for data alterations rather than HTL modifications
+
+## Conclusion
+
+Sling Models are the recommended approach for AEM backend development. With their annotation-based API, they drastically reduce boilerplate code and make your Java classes clean, testable, and easy to maintain.
+
+In **Part 2**, we will put these annotations into practice by building a real component with a dialog, multifield, and custom `@PostConstruct` logic. Stay tuned! 🚀

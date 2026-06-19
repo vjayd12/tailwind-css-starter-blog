@@ -1,0 +1,139 @@
+---
+title: 'AEM OSGi Services and Components — Part 2'
+date: 2025-06-13T15:32:14Z
+lastmod: '2025-06-13'
+tags: ['aem', 'osgi', 'aemdeveloper', 'backend', 'java', 'ocd']
+draft: false
+summary: 'A practical guide to OSGi Object Class Definition (OCD) in AEM — building type-safe, runtime-configurable services using @Designate, @ObjectClassDefinition, and @Modified.'
+layout: PostLayout
+---
+
+Hey Folks 👋 , Welcome to Part 2 of the OSGi Services series! In Part 1 we built a system user and a `ResourceHelper` service for JCR access. Now we tackle something every production AEM project needs — **runtime-configurable services** using **Object Class Definition (OCD)**.
+
+## What is OCD?
+
+**OCD (Object Class Definition)** is part of the OSGi component model and is used in the context of **Declarative Services (DS)**. It allows you to define typed configuration for your OSGi components so that administrators can modify values through the Felix console (`/system/console/configMgr`) without touching or redeploying code.
+
+### Four Primary Functions of OCD in AEM
+
+1. **Declarative Services (DS) Configuration** — Bind configuration to components declaratively
+2. **Component Configuration** — Define default values and property types
+3. **Configuration at Runtime** — Change values live without redeployment
+4. **Enabling External Configuration** — Support environment-specific values via `.cfg.json` files
+
+## Step-by-Step Implementation
+
+**Step 1 :-** Create the OCD configuration interface:
+
+```java
+package com.aemtutorial.core.config;
+
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
+
+@ObjectClassDefinition(name = "Domain API Configuration")
+public @interface DomainAPIConfiguration {
+
+    @AttributeDefinition(name = "API Endpoint URL", description = "External API endpoint")
+    String apiUrl() default "https://api.example.com/data";
+}
+```
+
+**Step 2 :-** Define the service interface:
+
+```java
+package com.aemtutorial.core.service;
+
+public interface FetchData {
+    String fetchFromApi();
+}
+```
+
+**Step 3 :-** Implement the service class with `@Designate`:
+
+```java
+package com.aemtutorial.core.service.impl;
+
+import com.aemtutorial.core.config.DomainAPIConfiguration;
+import com.aemtutorial.core.service.FetchData;
+import org.osgi.service.component.annotations.*;
+import org.osgi.service.metatype.annotations.Designate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Component(service = FetchData.class, immediate = true)
+@Designate(ocd = DomainAPIConfiguration.class)
+public class FetchDataImpl implements FetchData {
+
+    private static final Logger logger = LoggerFactory.getLogger(FetchDataImpl.class);
+
+    private String apiUrl;
+
+    @Activate
+    @Modified
+    protected void activate(DomainAPIConfiguration config) {
+        this.apiUrl = config.apiUrl();
+        logger.info("FetchDataImpl activated with API URL: {}", apiUrl);
+    }
+
+    @Deactivate
+    protected void deactivate() {
+        logger.info("FetchDataImpl deactivated.");
+    }
+
+    @Override
+    public String fetchFromApi() {
+        logger.info("Calling API: {}", apiUrl);
+        // HTTP call implementation here
+        return apiUrl;
+    }
+}
+```
+
+**Step 4 :-** Access the configuration in the Felix console. Navigate to:
+```
+http://localhost:4502/system/console/configMgr
+```
+Search for **"Domain API Configuration"** and you will see the configurable `apiUrl` field. Update it at runtime without redeploying!
+
+**Step 5 :-** Verify the logs to confirm configuration retrieval:
+
+```
+[INFO] FetchDataImpl activated with API URL: https://api.example.com/data
+```
+
+## Key Annotations
+
+| Annotation | Purpose |
+|---|---|
+| `@Designate` | Binds the OCD configuration interface to the component |
+| `@Modified` | Notifies the component when configuration changes occur at runtime |
+| `@ObjectClassDefinition` | Defines the configuration schema and its display name in configMgr |
+| `@AttributeDefinition` | Specifies individual property name, description, and default value |
+
+## Environment-Specific Configuration
+
+For AEM Cloud Service, you can provide environment-specific values by placing `.cfg.json` files in the appropriate `osgiconfig` folder:
+
+```
+ui.config/src/main/content/jcr_root/apps/<project>/osgiconfig/
+├── config/           ← author + publish
+├── config.author/    ← author only
+├── config.publish/   ← publish only
+└── config.dev/       ← dev environment only
+```
+
+```json
+// config.prod/com.aemtutorial.core.config.DomainAPIConfiguration.cfg.json
+{
+  "apiUrl": "https://api.production.com/data"
+}
+```
+
+## Conclusion
+
+OCD enables type-safe configuration definitions that improve code readability and support enterprise-grade AEM applications. It is the recommended approach for any configurable OSGi service in AEM.
+
+For cloud deployments, combine OCD with environment-specific `.cfg.json` files for clean, code-free environment management.
+
+You can find the complete source code on GitHub under the `feature/OSGi-Component-Creation` branch. 🚀

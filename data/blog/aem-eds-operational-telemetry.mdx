@@ -1,0 +1,83 @@
+---
+title: 'Operational Telemetry Tool in AEM Edge Delivery Services (EDS)'
+date: 2026-01-26T15:32:14Z
+lastmod: '2026-01-26'
+tags: ['aem', 'eds', 'aemdeveloper', 'edgedelivery', 'performance', 'telemetry']
+draft: false
+summary: 'A guide to the Operational Telemetry tool in AEM Edge Delivery Services — tracking Core Web Vitals, JS errors, and cache performance through a browser-based RUM dashboard.'
+layout: PostLayout
+---
+
+Hey Folks 👋 , In this article we will explore the **Operational Telemetry tool** in AEM Edge Delivery Services — a client-side, browser-based monitoring solution that is fundamentally different from traditional server-side tools like New Relic or Dynatrace.
+
+For EDS projects, where delivery happens at the edge and there's no traditional application server, this tool becomes your primary window into real-world performance.
+
+## What is Operational Telemetry?
+
+The Operational Telemetry tool is Adobe's built-in **Real User Monitoring (RUM)** solution for EDS. It collects performance data from actual user sessions in the browser and surfaces it through a dashboard tied to your domain.
+
+Unlike server-side APM tools, it captures exactly what your users experience — not what your origin server reports.
+
+## Core Capabilities
+
+The tool tracks the following metrics out of the box:
+
+- **Core Web Vitals** — LCP (Largest Contentful Paint), CLS (Cumulative Layout Shift), INP (Interaction to Next Paint), TTFB (Time to First Byte)
+- **JavaScript error tracking** — Uncaught exceptions and promise rejections
+- **Network and fetch failures** — Failed API calls and resource loads
+- **Cache hit/miss analysis** — CDN cache effectiveness metrics
+
+## Implementation Steps
+
+**Step 1 :-** Verify the RUM script loads in your EDS project. In your `scripts/scripts.js` (or equivalent), you should see the `helix-rum-js` loader:
+
+```javascript
+// In scripts/scripts.js — this should already be present in standard EDS projects
+import { sampleRUM } from './lib-franklin.js';
+sampleRUM('cwv');
+```
+
+Or the newer `rum.js` script reference from `_adobe/helix-rum-js`.
+
+**Step 2 :-** Request a **private key** from Adobe for your domain. This key authenticates your dashboard access. Contact Adobe support with your EDS domain.
+
+**Step 3 :-** Configure `AEM_OPTEL_NONCE` as `true` in **Cloud Manager** environment variables. This enables the nonce-based telemetry collection.
+
+**Step 4 :-** Access your monitoring dashboard using the provided URL structure:
+
+```
+https://rum.hlx.page/.rum/dashboard?domain=<your-domain>&key=<your-key>
+```
+
+**Step 5 :-** Replace the placeholder values with your actual domain and Adobe-supplied key.
+
+**Step 6 :-** To disable telemetry (e.g., for a staging environment), set `AEM_OPTEL_DISABLED` to `true` in Cloud Manager environment variables.
+
+## Dashboard Insights
+
+Once configured, the dashboard surfaces:
+
+| Metric | Description |
+|---|---|
+| **Page Views** | Total and unique session counts |
+| **Device Breakdown** | Desktop vs mobile vs tablet traffic split |
+| **Bounce Rate** | Single-page sessions percentage |
+| **Conversion Ratio** | Click-through and engagement metrics |
+| **Most Visited URLs** | Top pages by traffic volume |
+| **LCP Analysis** | Which elements are causing slow LCP scores |
+| **Image Performance** | Largest images impacting load times |
+| **Accessibility Metrics** | Interaction accessibility scores |
+
+## Why This Matters for EDS Projects
+
+EDS projects are built for performance — targeting perfect Core Web Vitals scores. Without real user monitoring, you're flying blind. The Operational Telemetry tool closes that loop by giving you:
+
+- **Real data** from actual user devices and network conditions (not synthetic lab tests)
+- **Cache visibility** to see if your CDN configuration is working as expected
+- **Error tracking** without a separate APM tool subscription
+
+## Conclusion
+
+The Operational Telemetry tool enables organizations to deliver faster, more reliable, and conversion-driven digital experiences through operational visibility and performance optimization — without sacrificing development speed or adding infrastructure complexity.
+
+For any EDS project going to production, this should be one of your first configuration steps. 🚀

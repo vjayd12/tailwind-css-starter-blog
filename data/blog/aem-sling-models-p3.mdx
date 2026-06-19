@@ -1,0 +1,95 @@
+---
+title: 'Understanding AEM Sling Models: A Complete Guide for Developers — Part 3'
+date: 2025-05-27T15:32:14Z
+lastmod: '2025-05-27'
+tags: ['aem', 'sling', 'aemdeveloper', 'backend', 'headless', 'json']
+draft: false
+summary: 'Exploring Jackson Exporter in AEM Sling Models — how to expose controlled JSON output for headless use cases using @Exporter, @JsonIgnore, and @JsonProperty.'
+layout: PostLayout
+---
+
+Hey Folks 👋 , Welcome to Part 3 of the Sling Models series! In Part 2 we built a full component with dialog, multifield, and custom `@PostConstruct` logic. Now we go headless — using **Jackson Exporter** to expose Sling Model content as controlled JSON.
+
+Everyone knows AEM supports the headless approach of sharing data to other channels or applications. Let's explore how to do it properly.
+
+## The Problem with Default AEM JSON
+
+AEM provides out-of-the-box Sling content export via `model.json` or `infinity.json` selectors.
+
+**Case 1 — Whole page JSON:**
+```
+http://localhost:4502/content/aemtutorial/us/en.infinity.json
+```
+
+**Case 2 — Specific component JSON:**
+```
+http://localhost:4502/content/aemtutorial/us/en/jcr:content/root/container/container/slingmodeldemo.infinity.json
+```
+
+The problem? The default approach exposes **excessive, potentially confidential data** with complex JCR structures that are hard for front-end developers to consume.
+
+## Jackson Exporter to the Rescue
+
+The `@Exporter` annotation empowers Sling Models to expose only the data you choose, in a clean, structured format.
+
+```java
+@Model(
+  adaptables = SlingHttpServletRequest.class,
+  defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL,
+  resourceType = "aemtutorial/components/custom-components/slingmodeldemo"
+)
+@Exporter(
+  name = "jackson",
+  extensions = "json",
+  options = {
+    @ExporterOption(name = "SerializationFeature.WRITE_DATES_AS_TIMESTAMPS", value = "true"),
+    @ExporterOption(name = "MapperFeature.SORT_PROPERTIES_ALPHABETICALLY", value = "true")
+  }
+)
+public class SlingModelDemoModel {
+
+    @ValueMapValue
+    @JsonIgnore
+    private String title;
+
+    @JsonProperty("customdata")
+    private String processedData;
+
+    // getters...
+}
+```
+
+Now accessing the component with the `.model.json` selector returns only your controlled output:
+```
+http://localhost:4502/content/aemtutorial/us/en/jcr:content/root/container/slingmodeldemo.model.json
+```
+
+## Annotation Reference
+
+| Annotation | Purpose |
+|---|---|
+| `resourceType` | Specifies which resource type this exporter applies to |
+| `@Exporter` | Enables JSON export on the Sling Model |
+| `name` | Defines the exporter library (`jackson`) |
+| `extensions` | Specifies output format (`json`) |
+| `@ExporterOption` | Optional restrictions on serialization behavior |
+| `@JsonIgnore` | Prevents a specific property from appearing in JSON output |
+| `@JsonProperty` | Customizes the JSON key name for a property |
+
+## Example Output
+
+Before Jackson Exporter — raw `infinity.json` exposes everything including internal JCR metadata.
+
+After Jackson Exporter — clean, controlled output:
+
+```json
+{
+  "customdata": "Current Page: Home"
+}
+```
+
+## Conclusion
+
+Jackson Exporter gives you granular control over what data is exposed and how it's structured, supporting AEM's headless CMS capabilities while maintaining data security and simplifying front-end integration.
+
+This wraps up the **Sling Models series** 🎉. You now have everything you need to build robust, headless-ready backend components in AEM. Check the GitHub repository for the complete source code.

@@ -1,0 +1,102 @@
+---
+title: 'AEM Logging Explained: Debugging, Configuring, and Best Practices'
+date: 2025-06-03T15:32:14Z
+lastmod: '2025-06-03'
+tags: ['aem', 'aemdeveloper', 'logging', 'debugging', 'backend']
+draft: false
+summary: 'A practical guide to AEM logging — understanding common log files, creating custom loggers, and using SLF4J effectively for debugging and monitoring.'
+layout: PostLayout
+---
+
+Hey Folks 👋 , In this article we will explore **logging in AEM** — a crucial part of monitoring, debugging, and troubleshooting your Adobe Experience Manager instance. AEM's logging system is built on the **Apache Sling Logging Framework**, which in turn relies on **SLF4J** and **Logback**.
+
+Whether you are debugging a component, tracking a failing bundle, or monitoring production traffic — understanding AEM logs is an essential skill for every AEM developer.
+
+## Common Log Files in AEM
+
+All log files are located at `/crx-quickstart/logs/`:
+
+**`error.log`** — The most commonly used log. Captures runtime errors with all severity levels: `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, and `TRACE`.
+
+**`access.log`** — Records all HTTP requests with status codes and response times. Useful for traffic analysis.
+
+**`request.log`** — Detailed HTTP request debugging information, including request headers and parameters.
+
+**`audit.log`** — Administrative changes and security events, logged at info level.
+
+**`bundle.log`** — OSGi bundle activities — activations, deactivations, and failures.
+
+**`stdout.log`** — Instance startup activities, useful for diagnosing boot issues.
+
+**`history.log`** — User content actions, useful for content audit trails.
+
+**`stderr.log`** — Error messages at various severity levels from the JVM.
+
+## Creating Custom Log Files
+
+Custom loggers let you isolate output from specific packages or classes into dedicated log files — invaluable for debugging without hunting through `error.log`.
+
+**Step 1 :-** Access the Sling Log Dashboard at:
+```
+http://localhost:4502/system/console/slinglog
+```
+
+**Step 2 :-** Select **"Add New Logger"** from the Configurations section.
+
+**Step 3 :-** Configure the log level (DEBUG, INFO, WARN, ERROR).
+
+**Step 4 :-** Enter your desired log file name (e.g., `logs/custom-component.log`).
+
+**Step 5 :-** Add the class or package name (e.g., `com.aemtutorial.core`).
+
+**Step 6 :-** Save. The logger is now active and SLF4J will route logs from that package to your custom file.
+
+## Using SLF4J in Your Code
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MyComponent {
+    private static final Logger logger =
+        LoggerFactory.getLogger(MyComponent.class);
+
+    public void execute() {
+        logger.info("Executing the AEM component.");
+        try {
+            // your logic here
+            logger.debug("Processing resource: {}", resourcePath);
+        } catch (Exception e) {
+            logger.error("Error occurred during execution.", e);
+        }
+    }
+}
+```
+
+> [!Note]
+> Always use parameterized logging (`logger.info("Value: {}", value)`) instead of string concatenation. This avoids unnecessary string construction when the log level is disabled, improving performance.
+
+## Log Levels — When to Use Which
+
+| Level | Use Case |
+|---|---|
+| `TRACE` | Very fine-grained flow tracing (dev only) |
+| `DEBUG` | Detailed diagnostic information |
+| `INFO` | Normal application events |
+| `WARN` | Unexpected but recoverable situations |
+| `ERROR` | Errors that affect functionality |
+| `FATAL` | Critical failures requiring immediate attention |
+
+## Best Practices
+
+- Use `DEBUG` for development, `INFO` or `WARN` for production
+- Always close `ResourceResolver` in a `finally` block — log if it fails
+- Create custom log files per feature or module for easier debugging
+- Never log sensitive data (passwords, tokens, PII)
+- Use structured log messages with `{}` placeholders, not concatenation
+
+## Conclusion
+
+Logging is your first line of defence when something goes wrong in AEM. A well-configured logging setup — with custom loggers, appropriate levels, and clean SLF4J usage — can cut your debugging time dramatically.
+
+Master your logs, master your AEM instance! 🚀
